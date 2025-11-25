@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">SmoothTransfer</string>
+    <string name="settings">Cài đặt</string>
+    <string name="back">Quay lại</string>
+    <string name="light_mode">Chế độ sáng</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="notifications">Thông báo</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="your_language">Ngôn ngữ của bạn</string>
+    <string name="language_english">Tiếng Anh</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_korean">Tiếng Hàn</string>
+    <string name="phone_clone">Sao chép điện thoại</string>
+    <string name="file_share">Chia sẻ tệp</string>
+    <string name="cancel">Hủy</string>
+    <string name="ok">OK</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
+    <string name="choose_device_role">Chọn vai trò cho thiết bị này</string>
+    <string name="send">Gửi</string>
+    <string name="from_this_phone">từ điện thoại này</string>
+    <string name="receive">Nhận</string>
+    <string name="on_this_phone">trên điện thoại này</string>
+    <string name="sender">Người gửi</string>
+    <string name="to">Đến</string>
+    <string name="receiver">Người nhận</string>
+</resources>

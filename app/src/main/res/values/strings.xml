@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">SmoothTransfer</string>
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="light_mode">Light mode</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="notifications">Notifications</string>
+    <string name="language">Language</string>
+    <string name="your_language">Your language</string>
+    <string name="language_english">English</string>
+    <string name="language_vietnamese">Vietnamese</string>
+    <string name="language_korean">Korean</string>
+    <string name="phone_clone">Phone Clone</string>
+    <string name="file_share">File Share</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="select_language">Select language</string>
+    <string name="choose_device_role">Choose the role for this device</string>
+    <string name="send">Send</string>
+    <string name="from_this_phone">from this phone</string>
+    <string name="receive">Receive</string>
+    <string name="on_this_phone">on this phone</string>
+    <string name="sender">Sender</string>
+    <string name="to">To</string>
+    <string name="receiver">Receiver</string>
+</resources>

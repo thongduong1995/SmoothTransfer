@@ -1,0 +1,62 @@
+package com.example.smoothtransfer.ui.phoneclone
+
+// Dùng "Contract" để nhóm State, Event, và có thể cả Effect
+object PhoneClone {
+
+    /**
+     * Đại diện cho tất cả các màn hình/trạng thái trong luồng Phone Clone.
+     * Mỗi object/class ở đây tương ứng với một màn hình UI.
+     */
+    sealed class State {
+        // Màn hình đầu tiên chọn Send/Receive (đã có ở PhoneCloneHomeScreen)
+        // Đây là các màn hình BÊN TRONG luồng
+        object SelectRole : State()
+        object SelectTransferMethod : State()
+        object ShowQrCodeToScan : State() // Sender thấy camera để quét
+        object DisplayQrCode : State()     // Receiver hiển thị QR code
+        data class Connecting(val message: String = "Connecting...") : State()
+        object Connected : State()
+        object WaitingForContentList : State() // Receiver đợi Sender gửi danh sách
+        data class ContentListSelection(val items: List<Any>) : State() // Receiver chọn data
+        data class Transferring(val progress: Float, val statusText: String) : State()
+        object Restoring : State()
+        object Completed : State()
+    }
+
+    /**
+     * Đại diện cho tất cả hành động người dùng hoặc sự kiện hệ thống
+     * mà ViewModel cần xử lý.
+     */
+    sealed class Event {
+        // User chọn phương thức
+        data class UsbAttached(val isSender: Boolean) : Event()
+        data class RoleSelected(val isSender: Boolean) : Event()
+
+        data class MethodSelected(val isWifi: Boolean) : Event()
+
+        // Sự kiện kết nối
+        data class QrCodeScanned(val qrData: String) : Event()
+        object ConnectionEstablished : Event()
+        object ConnectionFailed : Event()
+
+        // Sự kiện gửi/nhận content list
+        data class ContentListReady(val items: List<Any>) : Event() // Sender gửi
+        object RequestStartTransfer : Event() // Receiver bấm nút bắt đầu
+
+        // Sự kiện transfer
+        data class OnProgressUpdate(val progress: Float, val statusText: String) : Event()
+        object OnTransferFinished : Event()
+
+        // Sự kiện Restore
+        object OnRestoreFinished : Event()
+
+        // Kết thúc luồng
+        object FinishFlow : Event()
+
+        object BackPressed : Event()
+    }
+
+    interface PhoneCloneActions {
+        fun onEvent(event: Event)
+    }
+}
