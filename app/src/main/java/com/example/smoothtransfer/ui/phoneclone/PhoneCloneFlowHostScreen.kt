@@ -23,14 +23,16 @@ import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeScannerScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.SearchingContentScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.SelectTransferMethodScreen
 import com.example.smoothtransfer.viewmodel.MainViewModel
-import com.example.smoothtransfer.viewmodel.CloneFlowViewModel
+import com.example.smoothtransfer.viewmodel.MediaViewModel
+import com.example.smoothtransfer.viewmodel.PhoneCloneConnectionViewModel
 import java.util.UUID
 
 @Composable
 fun PhoneCloneFlowHostScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    viewModel: CloneFlowViewModel = viewModel()
+    viewModel: PhoneCloneConnectionViewModel = viewModel(),
+    mediaViewModel: MediaViewModel = viewModel()
 ) {
     val currentState by viewModel.state.collectAsState()
 

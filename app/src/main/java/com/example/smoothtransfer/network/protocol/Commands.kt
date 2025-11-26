@@ -37,6 +37,8 @@ object Commands {
     
     // Peer disconnect notification (sent before closing connection)
     const val CMD_PEER_DISCONNECT = 11
+
+    const val CMD_HEARTBEAT = 12
     
     /**
      * getCommandName - Get command name string from command number
