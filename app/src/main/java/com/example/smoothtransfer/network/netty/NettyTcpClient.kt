@@ -2,7 +2,7 @@ package com.example.smoothtransfer.network.netty
 
 
 import android.util.Log
-import com.example.smartswitchpc.network.encoder.PacketDecoder
+import com.example.smoothtransfer.network.encoder.PacketDecoder
 import com.example.smoothtransfer.network.encoder.PacketEncoder
 import com.example.smoothtransfer.network.protocol.Packet
 import io.netty.bootstrap.Bootstrap
@@ -47,12 +47,12 @@ import kotlin.concurrent.withLock
  *
  * Note: Default port is 8888 (matches receiver server port)
  */
-class NettyTcpClient {
+class NettyTcpClient(private val onStateChange: (Boolean) -> Unit)  {
     companion object {
         /**
          * PREFIX: Log tag prefix for Smart Switch
          */
-        private const val PREFIX = "Smart_Switch"
+        private const val PREFIX = "SmartSwitch"
 
         /**
          * TAG: Log tag for this class
@@ -186,6 +186,7 @@ class NettyTcpClient {
                 val cause = futureResult.cause()
                 Log.e(LOG_TAG, "Smart Switch: Failed to connect to $host:$port", cause)
                 _isConnected.value = false
+                onStateChange(false)
                 disconnect()
             }
         })
@@ -303,6 +304,7 @@ class NettyTcpClient {
         override fun channelActive(ctx: ChannelHandlerContext) {
             _isConnected.value = true
             Log.d(LOG_TAG, "Smart Switch: Channel active, connected to server: ${ctx.channel().remoteAddress()}")
+            onStateChange(true)
         }
 
         /**
@@ -341,6 +343,7 @@ class NettyTcpClient {
             writabilityLock.withLock {
                 writabilityCondition.signalAll()
             }
+            onStateChange(false)
         }
 
         /**

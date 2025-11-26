@@ -103,7 +103,7 @@ fun SelectTransferMethodScreen(
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
                     icon = { Icons.Default.PhoneAndroid },
                     backgroundColor = Color(0xFFA3C800), // Màu xanh lá cây
-                    onClick = { /*action.onEvent(PhoneClone.Event.RoleSelected(isSender = true)) */}
+                    onClick = { /*action.onEvent(PhoneClone.Event.RoleSelected(isSender)) */}
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -115,7 +115,7 @@ fun SelectTransferMethodScreen(
                     subtitle = if (isSender) "Send from this phone without internet" else "Receive from this phone without internet",
                     icon = { Icons.Default.PhoneAndroid },
                     backgroundColor = Color(0xFF00C853), // Màu xanh lá cây
-                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(isWifi = true)) }
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(true)) }
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -125,7 +125,7 @@ fun SelectTransferMethodScreen(
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
                     icon = { Icons.Default.PhoneAndroid }, // Icon nhận
                     backgroundColor = Color(0xFF2962FF), // Màu xanh dương
-                    onClick = { action.onEvent(PhoneClone.Event.RoleSelected(isSender = false)) }
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(true)) }
                 )
                 Spacer(modifier = Modifier.height(64.dp))
             }

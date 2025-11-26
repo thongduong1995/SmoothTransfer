@@ -14,11 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.ui.phoneclone.screens.ConnectedScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.ConnectingScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PermissionRequestScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PhoneCloneSelectRole
 import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeDisplayScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeScannerScreen
+import com.example.smoothtransfer.ui.phoneclone.screens.SearchingContentScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.SelectTransferMethodScreen
 import com.example.smoothtransfer.viewmodel.MainViewModel
 import com.example.smoothtransfer.viewmodel.CloneFlowViewModel
@@ -99,8 +101,11 @@ fun PhoneCloneFlowHostScreen(
             }
 
             is PhoneClone.State.Connected -> {
-                // Màn hình đã kết nối, chuẩn bị gửi/nhận dữ liệu
-                // ConnectedScreen(statusText = "Connected! Preparing data...")
+                ConnectedScreen(viewModel, targetState.deviceInfo)
+            }
+
+            is PhoneClone.State.SearchingContent -> {
+                SearchingContentScreen(viewModel, targetState.deviceInfo)
             }
 
             is PhoneClone.State.ContentListSelection -> {

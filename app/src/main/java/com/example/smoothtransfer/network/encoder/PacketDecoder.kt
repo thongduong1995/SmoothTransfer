@@ -1,4 +1,4 @@
-package com.example.smartswitchpc.network.encoder
+package com.example.smoothtransfer.network.encoder
 
 import com.example.smoothtransfer.network.protocol.Packet
 import io.netty.buffer.ByteBuf

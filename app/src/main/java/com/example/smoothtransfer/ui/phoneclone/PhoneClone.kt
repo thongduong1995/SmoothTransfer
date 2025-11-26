@@ -1,5 +1,7 @@
 package com.example.smoothtransfer.ui.phoneclone
 
+import com.example.smoothtransfer.network.protocol.DeviceInfo
+
 // Dùng "Contract" để nhóm State, Event, và có thể cả Effect
 object PhoneClone {
 
@@ -17,7 +19,9 @@ object PhoneClone {
         object ShowCameraToScanQr : State() // Sender thấy camera để quét
         data class DisplayQrCode(val isSender: Boolean) : State()     // Receiver hiển thị QR code
         data class Connecting(val message: String = "Connecting...") : State()
-        object Connected : State()
+        data class Connected(val deviceInfo: DeviceInfo) : State()
+
+        data class SearchingContent(val deviceInfo: DeviceInfo) : State()
         object WaitingForContentList : State() // Receiver đợi Sender gửi danh sách
         data class ContentListSelection(val items: List<Any>) : State() // Receiver chọn data
         data class Transferring(val progress: Float, val statusText: String) : State()
@@ -38,7 +42,7 @@ object PhoneClone {
 
         // Sự kiện kết nối
         data class QrCodeScanned(val qrData: String) : Event()
-        object ConnectionEstablished : Event()
+        data class ConnectionEstablished(val deviceInfo: DeviceInfo) : Event()
         object ConnectionFailed : Event()
 
         // Sự kiện gửi/nhận content list

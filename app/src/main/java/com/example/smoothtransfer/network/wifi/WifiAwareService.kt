@@ -27,6 +27,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
+import com.example.smoothtransfer.data.local.MainDataModel
 import java.net.Inet6Address
 import java.net.NetworkInterface
 import java.net.ServerSocket
@@ -380,6 +381,9 @@ class WifiAwareService(private val context: Context) {
                 val peerPort = peerAwareInfo?.port
                 Log.d(TAG, "onCapabilitiesChanged ip(${peerIpv6?.hostAddress}), port(${peerPort})")
                 peerIP = peerIpv6?.hostAddress
+                peerIP?.let {
+                    MainDataModel.setPeerIP(peerIP)
+                }
             }
 
             override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {

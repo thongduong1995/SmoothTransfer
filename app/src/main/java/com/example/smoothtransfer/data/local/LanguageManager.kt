@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Build
 
 import java.util.Locale
+import androidx.core.content.edit
 
 object LanguageManager {
     private const val PREFS_NAME = "language_prefs"
@@ -20,7 +21,7 @@ object LanguageManager {
 
         companion object {
             fun fromCode(code: String): Language {
-                return values().find { it.code == code } ?: ENGLISH
+                return Language.entries.find { it.code == code } ?: ENGLISH
             }
         }
     }
@@ -39,7 +40,7 @@ object LanguageManager {
      */
     fun saveLanguage(context: Context, language: Language) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_LANGUAGE, language.code).apply()
+        prefs.edit { putString(KEY_LANGUAGE, language.code) }
     }
 
     /**
@@ -50,16 +51,8 @@ object LanguageManager {
         Locale.setDefault(locale)
 
         val config = Configuration(context.resources.configuration)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            config.setLocale(locale)
-            return context.createConfigurationContext(config)
-        } else {
-            @Suppress("DEPRECATION")
-            config.locale = locale
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-        }
-        return context
+        config.setLocale(locale)
+        return context.createConfigurationContext(config)
     }
 
     /**
