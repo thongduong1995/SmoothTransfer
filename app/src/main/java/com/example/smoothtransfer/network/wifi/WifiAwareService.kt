@@ -16,7 +16,6 @@ import android.net.wifi.aware.IdentityChangedListener
 import android.net.wifi.aware.PeerHandle
 import android.net.wifi.aware.PublishConfig
 import android.net.wifi.aware.PublishDiscoverySession
-import android.net.wifi.aware.ServiceDiscoveryInfo
 import android.net.wifi.aware.SubscribeConfig
 import android.net.wifi.aware.SubscribeDiscoverySession
 import android.net.wifi.aware.WifiAwareManager
@@ -33,10 +32,9 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
 
-@RequiresApi(Build.VERSION_CODES.O)
-class WifiAwareManager(private val context: Context) {
+class WifiAwareService(private val context: Context) {
     companion object {
-        private const val TAG = "SmartSwitch WifiAwareManager"
+        private const val TAG = "SmartSwitch WifiAwareService"
         private const val SERVICE_NAME = "SmoothTransfer_Service"
         private const val PSK_PASSPHRASE = "SmoothTransfer2024"
     }
@@ -126,7 +124,7 @@ class WifiAwareManager(private val context: Context) {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        wifiAwareManager?.attach(object : AttachCallback() {
+        wifiAwareManager.attach(object : AttachCallback() {
             @RequiresPermission(Manifest.permission.NEARBY_WIFI_DEVICES)
             override fun onAttached(session: WifiAwareSession) {
                 super.onAttached(session)
@@ -136,7 +134,6 @@ class WifiAwareManager(private val context: Context) {
                 when (currentRole) {
                     Role.SENDER -> subscribe()
                     Role.RECEIVER -> publish()
-                    null -> Log.e(TAG, "Role not set before enabling WifiAwareManager")
                 }
             }
 
@@ -213,7 +210,7 @@ class WifiAwareManager(private val context: Context) {
                     ""
                 }
                 Log.d(TAG, "Discovered peerId: '$discoveredPeerId'")
-                this@WifiAwareManager.peerHandle = peerHandle
+                this@WifiAwareService.peerHandle = peerHandle
                 //connect()
                 if (subscribeSession != null && peerHandle != null) {
                     //connect(true)
@@ -228,7 +225,7 @@ class WifiAwareManager(private val context: Context) {
                 if(publishSession == null || peerHandle == null) return
 
 
-                this@WifiAwareManager.peerHandle = peerHandle
+                this@WifiAwareService.peerHandle = peerHandle
                 val ss = ServerSocket(0)
                 val port = ss.localPort
                 networkSpecifier = WifiAwareNetworkSpecifier.Builder(publishSession!!, peerHandle!!)
@@ -301,7 +298,7 @@ class WifiAwareManager(private val context: Context) {
                     ""
                 }
                 Log.d(TAG, "Discovered peerId: '$discoveredPeerId'")
-                this@WifiAwareManager.peerHandle = peerHandle
+                this@WifiAwareService.peerHandle = peerHandle
                 //connect()
                 if (subscribeSession != null && peerHandle != null) {
 
@@ -327,8 +324,8 @@ class WifiAwareManager(private val context: Context) {
                 if(true) {
                     val port = "1111"
                     Log.d(TAG, "received message(${port})")
-                    if (subscribeSession == null || this@WifiAwareManager.peerHandle == null) return
-                    networkSpecifier = WifiAwareNetworkSpecifier.Builder(subscribeSession!!, this@WifiAwareManager.peerHandle!!)
+                    if (subscribeSession == null || this@WifiAwareService.peerHandle == null) return
+                    networkSpecifier = WifiAwareNetworkSpecifier.Builder(subscribeSession!!, this@WifiAwareService.peerHandle!!)
                         .setPskPassphrase(PSK_PASSPHRASE)
                         .build()
                     requestNetwork()

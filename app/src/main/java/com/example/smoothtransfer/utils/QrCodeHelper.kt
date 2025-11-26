@@ -6,11 +6,11 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
-import com.example.smoothtransfer.network.wifi.WifiAwareQrData
 import kotlin.apply
 import kotlin.ranges.until
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
+import com.example.smoothtransfer.network.wifi.WifiAwareQrData
 
 object QrCodeHelper {
     /**

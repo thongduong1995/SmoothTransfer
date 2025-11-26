@@ -1,6 +1,6 @@
-package com.example.smoothtransfer.network.wifi.encoder
+package com.example.smoothtransfer.network.encoder
 
-import com.example.smoothtransfer.network.wifi.protocol.Packet
+import com.example.smoothtransfer.network.protocol.Packet
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToByteEncoder

@@ -1,4 +1,4 @@
-package com.example.smoothtransfer.network.wifi.protocol
+package com.example.smoothtransfer.network.protocol
 
 import com.google.gson.Gson
 import android.util.Log

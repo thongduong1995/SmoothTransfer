@@ -1,4 +1,4 @@
-package com.example.smoothtransfer.network.wifi.protocol
+package com.example.smoothtransfer.network.protocol
 
 import java.io.Serializable
 

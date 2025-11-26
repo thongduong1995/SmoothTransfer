@@ -1,10 +1,10 @@
-package com.example.smoothtransfer.network.wifi.netty
+package com.example.smoothtransfer.network.netty
 
 
 import android.util.Log
 import com.example.smartswitchpc.network.encoder.PacketDecoder
-import com.example.smoothtransfer.network.wifi.encoder.PacketEncoder
-import com.example.smoothtransfer.network.wifi.protocol.Packet
+import com.example.smoothtransfer.network.encoder.PacketEncoder
+import com.example.smoothtransfer.network.protocol.Packet
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup

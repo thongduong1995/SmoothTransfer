@@ -1,4 +1,4 @@
-package com.example.smoothtransfer.network.wifi.protocol
+package com.example.smoothtransfer.network.protocol
 
 /**
  * Command constants for communication between sender and receiver

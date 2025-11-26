@@ -2,12 +2,10 @@ package com.example.smoothtransfer.viewmodel
 
 import android.Manifest
 import android.app.Application
-import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
-import com.example.smoothtransfer.data.local.MainDataModel
-import com.example.smoothtransfer.network.wifi.WifiAwareManager
+import com.example.smoothtransfer.network.wifi.WifiAwareService
 import com.example.smoothtransfer.ui.navigation.DeepLinkHandler
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.utils.PermissionHelper
@@ -27,12 +25,12 @@ class CloneFlowViewModel(
     }
     private var isSender: Boolean = true
 
-    private var wifiAwareManager: WifiAwareManager? = null
+    private var wifiAwareService: WifiAwareService? = null
 
     init {
         // ViewModel sẽ tự động lắng nghe các sự kiện từ DeepLinkHandler
         // ngay khi nó được tạo ra.
-        wifiAwareManager = WifiAwareManager(context)
+        wifiAwareService = WifiAwareService(context)
 
         DeepLinkHandler.eventFlow
             .onEach { event ->
@@ -64,8 +62,8 @@ class CloneFlowViewModel(
 
             is PhoneClone.Event.QrCodeScanned -> {
                 _state.value = PhoneClone.State.Connecting()
-                wifiAwareManager?.setRole(WifiAwareManager.Role.SENDER)
-                wifiAwareManager?.enable()
+                wifiAwareService?.setRole(WifiAwareService.Role.SENDER)
+                wifiAwareService?.enable()
                 // transferCoordinator.connectToDevice(event.qrData)
                 // Giả lập kết nối thành công sau 2 giây
                 delay(15000)
@@ -100,8 +98,8 @@ class CloneFlowViewModel(
             } else {
                 Log.d(TAG, "handleSelectMethodEvents() - Receiver selected Wifi Aware, starting publisher")
                 updateState(PhoneClone.State.DisplayQrCode(isSender))
-                wifiAwareManager?.setRole(WifiAwareManager.Role.RECEIVER)
-                wifiAwareManager?.enable()
+                wifiAwareService?.setRole(WifiAwareService.Role.RECEIVER)
+                wifiAwareService?.enable()
             }
 
         } else { // Cable
