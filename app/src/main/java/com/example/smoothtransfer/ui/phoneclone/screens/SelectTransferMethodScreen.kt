@@ -1,6 +1,6 @@
 package com.example.smoothtransfer.ui.phoneclone.screens
 
-// Thêm import cho icon Android
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,8 +38,13 @@ import com.example.smoothtransfer.ui.theme.SmoothTransferTheme
 @Composable
 fun SelectTransferMethodScreen(
     action: PhoneClone.PhoneCloneActions,
+    isSender: Boolean,
     onBackClicked: () -> Unit
 ) {
+    BackHandler {
+        action.onEvent(PhoneClone.Event.BackPressed)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -95,29 +100,36 @@ fun SelectTransferMethodScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 // 3. Các nút chọn vai trò
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    RoleButton(
-                        modifier = Modifier.weight(1f),
-                        title = "Cable",
-                        subtitle = "from this phone",
-                        icon = { Icons.Default.PhoneAndroid },
-                        backgroundColor = Color(0xFF00C853), // Màu xanh lá cây
-                        onClick = { action.onEvent(PhoneClone.Event.RoleSelected(isSender = true)) }
-                    )
-                    RoleButton(
-                        modifier = Modifier.weight(1f),
-                        title = "Wifi",
-                        subtitle = "on this phone",
-                        icon = { Icons.Default.PhoneAndroid }, // Icon nhận
-                        backgroundColor = Color(0xFF2962FF), // Màu xanh dương
-                        onClick = { action.onEvent(PhoneClone.Event.RoleSelected(isSender = false)) }
-                    )
-                }
+                RoleButton(
+                    modifier = Modifier.weight(1f),
+                    title = "Cable",
+                    subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
+                    icon = { Icons.Default.PhoneAndroid },
+                    backgroundColor = Color(0xFFA3C800), // Màu xanh lá cây
+                    onClick = { /*action.onEvent(PhoneClone.Event.RoleSelected(isSender = true)) */}
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // 3. Các nút chọn vai trò
+                RoleButton(
+                    modifier = Modifier.weight(1f),
+                    title = "Wifi Aware",
+                    subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
+                    icon = { Icons.Default.PhoneAndroid },
+                    backgroundColor = Color(0xFF00C853), // Màu xanh lá cây
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(isWifi = true)) }
+                )
+                Spacer(modifier = Modifier.weight(1f))
+
+                RoleButton(
+                    modifier = Modifier.weight(1f),
+                    title = "Wifi",
+                    subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
+                    icon = { Icons.Default.PhoneAndroid }, // Icon nhận
+                    backgroundColor = Color(0xFF2962FF), // Màu xanh dương
+                    onClick = { action.onEvent(PhoneClone.Event.RoleSelected(isSender = false)) }
+                )
                 Spacer(modifier = Modifier.height(64.dp))
             }
         }
@@ -137,6 +149,6 @@ fun SelectTransferMethodScreenPreview() {
                 // Xử lý sự kiện ở đây
             }
         }
-        SelectTransferMethodScreen (action = fakeAction, onBackClicked = {})
+        SelectTransferMethodScreen (action = fakeAction, false, onBackClicked = {})
     }
 }

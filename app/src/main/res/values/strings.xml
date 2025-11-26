@@ -23,4 +23,8 @@
     <string name="sender">Sender</string>
     <string name="to">To</string>
     <string name="receiver">Receiver</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="sender_opening_camera">Sender is opening camera</string>
+    <string name="scan_qr_on_receiver">Please scan the QR code on the receiver</string>
+    <string name="place_qr_in_frame">Place the QR code in the frame to scan</string>
 </resources>

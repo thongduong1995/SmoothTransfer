@@ -11,9 +11,11 @@ object PhoneClone {
         // Màn hình đầu tiên chọn Send/Receive (đã có ở PhoneCloneHomeScreen)
         // Đây là các màn hình BÊN TRONG luồng
         object SelectRole : State()
-        object SelectTransferMethod : State()
-        object ShowQrCodeToScan : State() // Sender thấy camera để quét
-        object DisplayQrCode : State()     // Receiver hiển thị QR code
+        data class RequestPermissions(val isSender: Boolean) : State()
+
+        data class SelectTransferMethod(val isSender: Boolean) : State()
+        object ShowCameraToScanQr : State() // Sender thấy camera để quét
+        data class DisplayQrCode(val isSender: Boolean) : State()     // Receiver hiển thị QR code
         data class Connecting(val message: String = "Connecting...") : State()
         object Connected : State()
         object WaitingForContentList : State() // Receiver đợi Sender gửi danh sách
@@ -54,6 +56,8 @@ object PhoneClone {
         object FinishFlow : Event()
 
         object BackPressed : Event()
+
+        data class PermissionsGranted(val isSender: Boolean) : Event()
     }
 
     interface PhoneCloneActions {

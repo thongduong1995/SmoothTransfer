@@ -23,4 +23,8 @@
     <string name="sender">Người gửi</string>
     <string name="to">Đến</string>
     <string name="receiver">Người nhận</string>
+    <string name="scan_qr_code">Quét mã QR</string>
+    <string name="sender_opening_camera">Người gửi đang mở camera</string>
+    <string name="scan_qr_on_receiver">Vui lòng quét mã QR trên thiết bị nhận</string>
+    <string name="place_qr_in_frame">Đặt mã QR vào trong khung để quét</string>
 </resources>

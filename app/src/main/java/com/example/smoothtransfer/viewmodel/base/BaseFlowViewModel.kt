@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.viewmodel.base
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,10 @@ import kotlinx.coroutines.launch
  * @param S Kiểu dữ liệu cho State (ví dụ: PhoneClone.State)
  * @param E Kiểu dữ liệu cho Event (ví dụ: PhoneClone.Event)
  */
-abstract class BaseFlowViewModel<S : Any, E : Any>(initialState: S) : ViewModel() {
+abstract class BaseFlowViewModel<S : Any, E : Any>(
+    application: Application,
+    initialState: S
+) : AndroidViewModel(application) {
 
     // --- State Management ---
     protected val _state = MutableStateFlow(initialState)

@@ -22,7 +22,6 @@ import com.example.smoothtransfer.ui.MainScreen
 import com.example.smoothtransfer.ui.navigation.DeepLinkHandler
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.ui.theme.SmoothTransferTheme
-import com.example.smoothtransfer.utils.LocaleHelper
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

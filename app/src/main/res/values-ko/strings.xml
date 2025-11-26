@@ -23,4 +23,8 @@
     <string name="sender">보내는 사람</string>
     <string name="to">에게</string>
     <string name="receiver">받는 사람</string>
+    <string name="scan_qr_code">QR 코드 스캔</string>
+    <string name="sender_opening_camera">보내는 사람이 카메라를 여는 중입니다</string>
+    <string name="scan_qr_on_receiver">받는 사람의 QR 코드를 스캔하세요</string>
+    <string name="place_qr_in_frame">스캔하려면 프레임에 QR 코드를 놓으세요</string>
 </resources>

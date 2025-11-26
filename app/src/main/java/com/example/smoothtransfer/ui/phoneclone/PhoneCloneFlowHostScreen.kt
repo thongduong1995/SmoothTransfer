@@ -13,10 +13,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.ui.phoneclone.screens.PermissionRequestScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PhoneCloneSelectRole
+import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeDisplayScreen
+import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeScannerScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.SelectTransferMethodScreen
 import com.example.smoothtransfer.viewmodel.MainViewModel
 import com.example.smoothtransfer.viewmodel.CloneFlowViewModel
+import java.util.UUID
 
 @Composable
 fun PhoneCloneFlowHostScreen(
@@ -68,19 +73,20 @@ fun PhoneCloneFlowHostScreen(
             is PhoneClone.State.SelectTransferMethod -> {
                 SelectTransferMethodScreen(
                     action = viewModel,
+                    targetState.isSender,
                     onBackClicked = {
                         viewModel.onEvent(PhoneClone.Event.BackPressed)
                     }
                 )
             }
 
-            is PhoneClone.State.ShowQrCodeToScan -> {
-                // Màn hình Camera để quét QR
-                /*QrCodeScannerScreen(
-                onQrCodeScanned = { qrData ->
-                    viewModel.onEvent(PhoneClone.Event.QrCodeScanned(qrData))
-                }
-            )*/
+            is PhoneClone.State.ShowCameraToScanQr -> {
+                QrCodeScannerScreen(
+                    viewModel,
+                    onBackClicked = {
+                        viewModel.onEvent(PhoneClone.Event.BackPressed)
+                    }
+                )
             }
 
             is PhoneClone.State.Connecting -> {
@@ -115,11 +121,28 @@ fun PhoneCloneFlowHostScreen(
 
             // --- Các màn hình khác của luồng Receiver sẽ được thêm vào đây ---
             is PhoneClone.State.DisplayQrCode -> {
-                // DisplayQrScreen(...)
+                val qrData = WifiAwareQrData(
+                    serviceName = "SmartSwitch",
+                    peerId = UUID.randomUUID().toString(),
+                    connectionMetadata = ""
+                )
+                QrCodeDisplayScreen(viewModel, qrData, onBackClicked = {
+                    viewModel.onEvent(PhoneClone.Event.BackPressed)
+                })
             }
 
             is PhoneClone.State.WaitingForContentList -> {
                 // WaitingScreen(...)
+            }
+
+            is PhoneClone.State.RequestPermissions -> {
+                PermissionRequestScreen(
+                    action = viewModel,
+                    isSender = targetState.isSender,
+                    onBackClicked = {
+                        viewModel.onEvent(PhoneClone.Event.BackPressed)
+                    }
+                )
             }
         }
     }
