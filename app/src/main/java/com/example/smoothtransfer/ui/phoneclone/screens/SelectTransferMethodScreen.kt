@@ -2,18 +2,14 @@ package com.example.smoothtransfer.ui.phoneclone.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -115,7 +111,7 @@ fun SelectTransferMethodScreen(
                 RoleButton(
                     modifier = Modifier.weight(1f),
                     title = "Wifi Aware",
-                    subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
+                    subtitle = if (isSender) "Send from this phone without internet" else "Receive from this phone without internet",
                     icon = { Icons.Default.PhoneAndroid },
                     backgroundColor = Color(0xFF00C853), // Màu xanh lá cây
                     onClick = { action.onEvent(PhoneClone.Event.MethodSelected(isWifi = true)) }
@@ -135,9 +131,6 @@ fun SelectTransferMethodScreen(
         }
     }
 }
-
-
-
 
 // --- Preview để xem trước giao diện ---
 @Preview(showBackground = true, showSystemUi = true)

@@ -6,6 +6,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
+import com.example.smoothtransfer.data.local.MainDataModel
 import com.example.smoothtransfer.network.wifi.WifiAwareManager
 import com.example.smoothtransfer.ui.navigation.DeepLinkHandler
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
@@ -31,9 +32,7 @@ class CloneFlowViewModel(
     init {
         // ViewModel sẽ tự động lắng nghe các sự kiện từ DeepLinkHandler
         // ngay khi nó được tạo ra.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            wifiAwareManager = WifiAwareManager(context)
-        }
+        wifiAwareManager = WifiAwareManager(context)
 
         DeepLinkHandler.eventFlow
             .onEach { event ->
@@ -65,9 +64,11 @@ class CloneFlowViewModel(
 
             is PhoneClone.Event.QrCodeScanned -> {
                 _state.value = PhoneClone.State.Connecting()
+                wifiAwareManager?.setRole(WifiAwareManager.Role.SENDER)
+                wifiAwareManager?.enable()
                 // transferCoordinator.connectToDevice(event.qrData)
                 // Giả lập kết nối thành công sau 2 giây
-                delay(2000)
+                delay(15000)
                 onEvent(PhoneClone.Event.ConnectionEstablished)
             }
 
@@ -99,10 +100,8 @@ class CloneFlowViewModel(
             } else {
                 Log.d(TAG, "handleSelectMethodEvents() - Receiver selected Wifi Aware, starting publisher")
                 updateState(PhoneClone.State.DisplayQrCode(isSender))
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    wifiAwareManager?.setRole(WifiAwareManager.Role.RECEIVER)
-                    wifiAwareManager?.enable()
-                }
+                wifiAwareManager?.setRole(WifiAwareManager.Role.RECEIVER)
+                wifiAwareManager?.enable()
             }
 
         } else { // Cable
@@ -114,11 +113,9 @@ class CloneFlowViewModel(
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     private fun handleSelectMethodEventsFromSender(event: PhoneClone.Event.MethodSelected) {
         updateState(PhoneClone.State.ShowCameraToScanQr)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            wifiAwareManager?.setRole(WifiAwareManager.Role.SENDER)
-            wifiAwareManager?.enable()
-        }
-
+       /* wifiAwareManager?.setRole(WifiAwareManager.Role.SENDER)
+        wifiAwareManager?.enable()*/
+        //_state.value = PhoneClone.State.Connecting("Connecting")
         // transferCoordinator.startWifiScan()
     }
 }

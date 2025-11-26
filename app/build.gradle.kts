@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.smoothtransfer"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -75,6 +75,8 @@ dependencies {
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
+
+    implementation(libs.gson)
 
     // Kotlinx Serialization for JSON
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")

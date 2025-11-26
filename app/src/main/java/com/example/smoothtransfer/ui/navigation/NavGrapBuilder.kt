@@ -20,7 +20,7 @@ import com.example.smoothtransfer.ui.settings.SettingsScreen
 
 fun NavGraphBuilder.phoneCloneNavGraph(
     navController: NavController,
-    mainViewModel: MainViewModel // <<< Nhận vào MainViewModel
+    mainViewModel: MainViewModel
 ) {
     composable(route = BottomNavScreen.PhoneClone.route) {
         PhoneCloneFlowHostScreen(

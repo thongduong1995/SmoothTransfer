@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.ui.phoneclone.screens.ConnectingScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PermissionRequestScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PhoneCloneSelectRole
 import com.example.smoothtransfer.ui.phoneclone.screens.QrCodeDisplayScreen
@@ -91,7 +92,10 @@ fun PhoneCloneFlowHostScreen(
 
             is PhoneClone.State.Connecting -> {
                 // Màn hình hiển thị đang kết nối...
-                // ConnectingScreen(message = state.message)
+                ConnectingScreen(
+                    message = targetState.message,
+                    action = viewModel
+                )
             }
 
             is PhoneClone.State.Connected -> {
