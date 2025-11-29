@@ -1,27 +1,33 @@
 package com.example.smoothtransfer.data.local
 
-
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
-
-import java.util.Locale
+import androidx.annotation.DrawableRes
 import androidx.core.content.edit
+import com.example.smoothtransfer.R
+import java.util.Locale
 
 object LanguageManager {
     private const val PREFS_NAME = "language_prefs"
     private const val KEY_LANGUAGE = "selected_language"
 
-    // Supported languages
-    enum class Language(val code: String, val displayName: String) {
-        ENGLISH("en", "English"),
-        VIETNAMESE("vi", "Tiếng Việt"),
-        KOREAN("ko", "한국어"),
-        JAPANESE("ja", "日本語");
+    // Supported languages with flags
+    enum class Language(val code: String, val displayName: String, @DrawableRes val flagResId: Int) {
+        ENGLISH("en", "English", R.drawable.ic_flag_us),
+        VIETNAMESE("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        JAPAN("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        CHINA("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        US("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        SPAIN("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        SPAIN1("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        SPAIN2("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        SPAIN3("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        GERMANY("vi", "Tiếng Việt", R.drawable.ic_flag_vi),
+        KOREAN("ko", "한국어", R.drawable.ic_flag_ko);
 
         companion object {
             fun fromCode(code: String): Language {
-                return Language.entries.find { it.code == code } ?: ENGLISH
+                return entries.find { it.code == code } ?: ENGLISH
             }
         }
     }
@@ -68,4 +74,3 @@ object LanguageManager {
         }
     }
 }
-

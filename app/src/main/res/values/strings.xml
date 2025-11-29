@@ -29,4 +29,5 @@
     <string name="place_qr_in_frame">Place the QR code in the frame to scan</string>
     <string name="connected_to">Connected to %1$s</string>
     <string name="searching_for_data">Searching for data to transfer...</string>
+    <string name="search_language">Search language</string>
 </resources>

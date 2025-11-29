@@ -29,4 +29,5 @@
     <string name="place_qr_in_frame">스캔하려면 프레임에 QR 코드를 놓으세요</string>
     <string name="connected_to">%1$s에 연결됨</string>
     <string name="searching_for_data">전송할 데이터 검색 중...</string>
+    <string name="search_language">언어 검색</string>
 </resources>

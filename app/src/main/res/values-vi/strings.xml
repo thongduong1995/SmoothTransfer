@@ -29,4 +29,5 @@
     <string name="place_qr_in_frame">Đặt mã QR vào trong khung để quét</string>
     <string name="connected_to">Đã kết nối với %1$s</string>
     <string name="searching_for_data">Đang tìm dữ liệu để chuyển...</string>
+    <string name="search_language">Tìm kiếm ngôn ngữ</string>
 </resources>

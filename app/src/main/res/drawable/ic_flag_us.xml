@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="1235"
+    android:viewportHeight="650">
+    <!-- This is a simplified version of the US flag for demonstration -->
+    <path android:fillColor="#bf0a30" android:pathData="M0,0h1235v650h-1235z"/>
+    <path android:fillColor="#ffffff" android:pathData="M0,65h1235v50h-1235z M0,165h1235v50h-1235z M0,265h1235v50h-1235z M0,365h1235v50h-1235z M0,465h1235v50h-1235z M0,565h1235v50h-1235z"/>
+    <path android:fillColor="#002868" android:pathData="M0,0h494v350h-494z"/>
+</vector>

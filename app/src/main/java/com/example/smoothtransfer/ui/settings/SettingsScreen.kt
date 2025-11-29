@@ -1,5 +1,7 @@
 package com.example.smoothtransfer.ui.settings
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,13 +9,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -21,6 +28,7 @@ import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -32,6 +40,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -46,9 +56,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -106,11 +120,11 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = 2.dp,
+                    width = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), // Sử dụng outline color từ theme
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(20.dp)
                 ),
-            shape = RoundedCornerShape(16.dp), // Bo góc 16dp
+            shape = RoundedCornerShape(20.dp), // Bo góc 16dp
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface // Sử dụng surface color từ theme
             ),
@@ -167,13 +181,16 @@ fun SettingsScreen(
                         },
                         modifier = Modifier.scale(
                             scaleX = 1f,
-                            scaleY = 0.95f
-                        ), // Giảm chiều cao hơn (giảm 15%)
+                            scaleY = 0.9f
+                        )
+                        , // Giảm chiều cao hơn (giảm 15%)
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF4CAF50),
-                            uncheckedThumbColor = Color.White,
-                            uncheckedTrackColor = Color(0xFF737371)
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            //checkedBorderColor = Color.Transparent,
+                            // Màu khi tắt
+                            uncheckedThumbColor = Color.White, // Màu thumb xám nhạt
+                            uncheckedTrackColor = Color.Gray
                         )
                     )
                 }
@@ -206,7 +223,7 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Normal, // Giảm độ đậm
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Sử dụng onSurface từ theme
                         )
-                        Card(
+                      /*  Card(
                             onClick = {
                                 val timeParts = notificationTime.split(":")
                                 val currentHour =
@@ -264,23 +281,44 @@ fun SettingsScreen(
                                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
-                        }
+                        }*/
                     }
+
                     Switch(
                         checked = isNotificationEnabled,
                         onCheckedChange = {
                             isNotificationEnabled = it
                         }, // Update state khi click
+                        thumbContent = {
+                            Icon(
+                                imageVector = Icons.Default.Circle,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                                tint = Color.White
+                            )
+                        },
                         modifier = Modifier.scale(
                             scaleX = 1f,
-                            scaleY = 0.95f
+                            scaleY = 0.9f
                         ), // Giảm chiều cao hơn (giảm 15%)
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFFFF9800).copy(alpha = 0.5f),
-                            uncheckedThumbColor = Color.White,
-                            uncheckedTrackColor = Color.Gray.copy(alpha = 0.2f)
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            //checkedBorderColor = Color.Transparent,
+                            // Màu khi tắt
+                            uncheckedThumbColor = Color.White, // Màu thumb xám nhạt
+                            uncheckedTrackColor = Color.Gray
+                            //uncheckedBorderColor = Color.Transparent
                         )
+
+                     /*  // Màu khi bật checkedThumbColor = Color.White,
+
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        checkedBorderColor = Color.Transparent,
+                        // Màu khi tắt
+                        uncheckedThumbColor = Color(0xFFE0E0E0), // Màu thumb xám nhạt
+                        uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        uncheckedBorderColor = Color.Transparent*/
                     )
                 }
 
@@ -290,14 +328,16 @@ fun SettingsScreen(
                  * LANGUAGE SELECTION
                  */
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Language,
@@ -315,8 +355,8 @@ fun SettingsScreen(
                         Box {
                             Card(
                                 onClick = { showLanguageDialog = true },
-                                modifier = Modifier.height(36.dp),
-                                shape = RoundedCornerShape(12.dp), // Bo tròn nhiều hơn giống iOS
+
+                                shape = RoundedCornerShape(16.dp), // Bo tròn nhiều hơn giống iOS
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 ),
@@ -324,7 +364,7 @@ fun SettingsScreen(
                                     width = 0.5.dp,
                                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                                 ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp) // Shadow nhẹ
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Shadow nhẹ
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -377,6 +417,7 @@ fun SettingsScreen(
  * @param onDismiss Callback invoked when dialog is dismissed
  * @param onLanguageSelected Callback invoked when a language is selected
  */
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 private fun LanguageSelectionDialog(
     currentLanguage: LanguageManager.Language,
@@ -384,35 +425,110 @@ private fun LanguageSelectionDialog(
     onLanguageSelected: (LanguageManager.Language) -> Unit
 ) {
     var selectedLanguage by remember { mutableStateOf(currentLanguage) }
+    val screenHight = LocalConfiguration.current.screenHeightDp.dp
+    var searchQuery by remember { mutableStateOf("") }
+
+    // >>> 2. TẠO DANH-SÁCH NGÔN-NGỮ ĐÃ LỌC <<<
+    val filteredLanguages = remember(searchQuery, LanguageManager.Language.entries) {
+        if (searchQuery.isBlank()) {
+            LanguageManager.Language.entries.toList()
+        } else {
+            LanguageManager.Language.entries.filter {
+                it.displayName.contains(searchQuery, ignoreCase = true) ||
+                        it.code.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        // >>> DI CHUYỂN TOÀN BỘ LOGIC VÀO ĐÂY <<<
         title = {
-            Text(stringResource(R.string.select_language))
-        },
-        text = {
             Column {
-                LanguageManager.Language.entries.forEach { language ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { selectedLanguage = language }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                // 1. Thêm lại tiêu đề của dialog
+                Text(
+                    text = stringResource(R.string.select_language),
+                    style = MaterialTheme.typography.headlineSmall, // Dùng style cho tiêu đề
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                )
+
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        // Gợi ý cho TextField có chiều cao tối thiểu là 48.dp
+                        // nhưng vẫn cho phép nó lớn hơn một chút nếu cần để không cắt chữ
+                        .defaultMinSize(minHeight = 48.dp),  // TextField sẽ chiếm hết chiều rộng của Box
+                    placeholder = { Text(stringResource(R.string.search_language)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                // 2. Thêm đường kẻ ngang
+                HorizontalDivider()
+
+                // 3. Phần nội dung có thể cuộn
+                val scrollState = rememberScrollState()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = screenHight / 2) // Bạn có thể dùng 200.dp hoặc 250.dp
+                ) {
+                    Column(
+                        modifier = Modifier.verticalScroll(scrollState)
                     ) {
-                        RadioButton(
-                            selected = selectedLanguage == language,
-                            onClick = { selectedLanguage = language }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = language.displayName,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+                        LanguageManager.Language.entries.forEach { language ->
+                            // Row của bạn không có gì thay đổi
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { selectedLanguage = language }
+                                    // Thêm padding ngang cho các item bên trong
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = selectedLanguage == language,
+                                    onClick = { selectedLanguage = language }
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Image(
+                                    painter = painterResource(id = language.flagResId),
+                                    contentDescription = "${language.displayName} flag",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(RoundedCornerShape(4.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = language.displayName,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
                     }
                 }
             }
         },
+
+        // >>> ĐỂ THAM SỐ NÀY THÀNH NULL <<<
+        text = null,
         confirmButton = {
             TextButton(
                 onClick = {
