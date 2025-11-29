@@ -10,16 +10,16 @@
     <string name="language_english">Tiếng Anh</string>
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_korean">Tiếng Hàn</string>
-    <string name="phone_clone">Sao chép điện thoại</string>
+    <string name="phone_clone">Di chuyển điện thoại</string>
     <string name="file_share">Chia sẻ tệp</string>
     <string name="cancel">Hủy</string>
     <string name="ok">OK</string>
     <string name="select_language">Chọn ngôn ngữ</string>
     <string name="choose_device_role">Chọn vai trò cho thiết bị này</string>
     <string name="send">Gửi</string>
-    <string name="from_this_phone">từ điện thoại này</string>
+    <string name="from_this_phone">Gửi từ điện thoại này</string>
     <string name="receive">Nhận</string>
-    <string name="on_this_phone">trên điện thoại này</string>
+    <string name="on_this_phone">Nhận trên điện thoại này</string>
     <string name="sender">Người gửi</string>
     <string name="to">Đến</string>
     <string name="receiver">Người nhận</string>
@@ -30,4 +30,6 @@
     <string name="connected_to">Đã kết nối với %1$s</string>
     <string name="searching_for_data">Đang tìm dữ liệu để chuyển...</string>
     <string name="search_language">Tìm kiếm ngôn ngữ</string>
+    <string name="old_phone">Điện thoại cũ</string>
+    <string name="new_phone">Điện thoại mới</string>
 </resources>

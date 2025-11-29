@@ -10,16 +10,16 @@
     <string name="language_english">English</string>
     <string name="language_vietnamese">Vietnamese</string>
     <string name="language_korean">Korean</string>
-    <string name="phone_clone">Phone Clone</string>
+    <string name="phone_clone">Phone Mover</string>
     <string name="file_share">File Share</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="select_language">Select language</string>
     <string name="choose_device_role">Choose the role for this device</string>
     <string name="send">Send</string>
-    <string name="from_this_phone">from this phone</string>
+    <string name="from_this_phone">Send from this Phone</string>
     <string name="receive">Receive</string>
-    <string name="on_this_phone">on this phone</string>
+    <string name="on_this_phone">Receive on this Phone</string>
     <string name="sender">Sender</string>
     <string name="to">To</string>
     <string name="receiver">Receiver</string>
@@ -30,4 +30,6 @@
     <string name="connected_to">Connected to %1$s</string>
     <string name="searching_for_data">Searching for data to transfer...</string>
     <string name="search_language">Search language</string>
+    <string name="old_phone">Old Phone</string>
+    <string name="new_phone">New Phone</string>
 </resources>

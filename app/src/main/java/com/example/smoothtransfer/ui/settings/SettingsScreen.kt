@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.ui.settings
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -116,6 +117,7 @@ fun SettingsScreen(
             .padding(16.dp), // Padding thêm 16dp
         verticalArrangement = Arrangement.spacedBy(4.dp) // Khoảng cách giữa các items
     ) {
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,6 +139,13 @@ fun SettingsScreen(
                 /**
                  * LIGHT/DARK MODE TOGGLE
                  */
+                Text(
+                    text = "General settings",
+                    style = MaterialTheme.typography.titleMedium, // Dùng style có sẵn của theme cho tiêu đề
+                    color = MaterialTheme.colorScheme.primary, // Dùng màu primary để làm nổi bật
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
                 Row(
                     modifier = Modifier.fillMaxWidth(), // Chiếm toàn bộ chiều rộng
                     horizontalArrangement = Arrangement.SpaceBetween, // Đẩy về 2 đầu
@@ -360,7 +369,7 @@ fun SettingsScreen(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 ),
-                                border = androidx.compose.foundation.BorderStroke(
+                                border = BorderStroke(
                                     width = 0.5.dp,
                                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                                 ),
@@ -402,6 +411,18 @@ fun SettingsScreen(
                         }
                     )
                 }
+
+
+                /**
+                 * LIGHT/DARK MODE TOGGLE
+                 */
+                Text(
+                    text = "Others",
+                    style = MaterialTheme.typography.titleMedium, // Dùng style có sẵn của theme cho tiêu đề
+                    color = MaterialTheme.colorScheme.primary, // Dùng màu primary để làm nổi bật
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
             }
         }
     }
@@ -455,7 +476,8 @@ private fun LanguageSelectionDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         // Gợi ý cho TextField có chiều cao tối thiểu là 48.dp
                         // nhưng vẫn cho phép nó lớn hơn một chút nếu cần để không cắt chữ
@@ -556,3 +578,4 @@ fun SettingsScreenPreview() {
         )
     }
 }
+

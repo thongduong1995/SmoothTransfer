@@ -1,14 +1,22 @@
 package com.example.smoothtransfer.ui.phoneclone.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,12 +30,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.ui.theme.SmoothTransferTheme
 
@@ -97,7 +110,7 @@ fun SelectTransferMethodScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 // 3. Các nút chọn vai trò
-                RoleButton(
+                MethodSelectButton(
                     modifier = Modifier.weight(1f),
                     title = "Cable",
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
@@ -109,7 +122,7 @@ fun SelectTransferMethodScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 // 3. Các nút chọn vai trò
-                RoleButton(
+                MethodSelectButton(
                     modifier = Modifier.weight(1f),
                     title = "Wifi Aware",
                     subtitle = if (isSender) "Send from this phone without internet" else "Receive from this phone without internet",
@@ -119,7 +132,7 @@ fun SelectTransferMethodScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                RoleButton(
+                MethodSelectButton(
                     modifier = Modifier.weight(1f),
                     title = "Wifi",
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
@@ -132,6 +145,61 @@ fun SelectTransferMethodScreen(
         }
     }
 }
+
+@Composable
+fun MethodSelectButton(
+    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+    icon: @Composable () -> Unit,
+    backgroundColor: Color,
+    onClick: () -> Unit
+) {
+    // Thêm hiệu ứng nhấp nháy nhẹ khi nhấn
+    val infiniteTransition = rememberInfiniteTransition(label = "role_button_transition")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500),
+            repeatMode = RepeatMode.Reverse
+        ), label = "role_button_scale"
+    )
+
+    Box(
+        modifier = modifier
+            /* .graphicsLayer {
+                 scaleX = scale
+                 scaleY = scale
+             }*/
+            .clip(RoundedCornerShape(24.dp))
+            .background(backgroundColor)
+            .clickable(onClick = onClick)
+            .padding(16.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            icon()
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = subtitle,
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
 
 // --- Preview để xem trước giao diện ---
 @Preview(showBackground = true, showSystemUi = true)
