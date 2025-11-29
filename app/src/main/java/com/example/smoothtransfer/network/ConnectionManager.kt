@@ -14,32 +14,34 @@ import com.example.smoothtransfer.network.protocol.Commands
 import com.example.smoothtransfer.network.protocol.DeviceInfo
 import com.example.smoothtransfer.network.protocol.Packet
 import com.example.smoothtransfer.network.wifi.WifiAwareService
+import com.example.smoothtransfer.transfer.TransferEvent
+import com.example.smoothtransfer.transfer.TransferSession
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.utils.NetworkUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-
-interface ConnectionManagerListener {
-    fun onStateUpdate(newState: PhoneClone.State)
-}
-
 class ConnectionManager(
-    private val context: Application,
-    private val listener: ConnectionManagerListener
+    private val context: Application
 ) {
     companion object {
         private const val TAG = "SmartSwitch ConnectionManager"
         private const val TCP_PORT = 8888
     }
 
+    // Thay vì ConnectionEvent, giờ chúng ta dùng TransferEvent
+    private val _events = MutableSharedFlow<TransferEvent>()
+    val events: SharedFlow<TransferEvent> = _events.asSharedFlow()
+
     private var wakeLock: PowerManager.WakeLock? = null
-    var isSender: Boolean = false
     private val scope = CoroutineScope(Dispatchers.IO)
     private val wifiAwareService: WifiAwareService = WifiAwareService(context)
 
@@ -66,10 +68,11 @@ class ConnectionManager(
     }
 
     private fun handleTcpConnectionResult(connected: Boolean, isServer: Boolean) {
+        val isSender = TransferSession.isSender()
         Log.d(TAG, "handleTcpConnectionResult. isSender: $isSender, connected: $connected, isServer: $isServer")
         if (connected) {
             acquireWakeLock()
-            if (isSender) {
+            if (TransferSession.isSender()) {
                 sendDeviceInfo()
             }
         } else {
@@ -110,6 +113,7 @@ class ConnectionManager(
     }
 
     private fun sendPacket(packet: Packet) {
+        val isSender = TransferSession.isSender()
         if (isSender) {
             nettyClient.sendPacket(packet)
         } else {
@@ -135,14 +139,17 @@ class ConnectionManager(
         scope.launch {
             // Lấy địa chỉ IP đầu tiên không phải null từ MainDataModel
             val peerIp = MainDataModel.peerIP.filterNotNull().first()
+            Log.d(TAG, "Got peer IP: $peerIp.")
+            val isSender = TransferSession.isSender()
             if (isSender) {
                 connectToServer(peerIp)
             } else {
                 nettyServer.start ()
             }
             // Khi có IP, chuyển sang màn hình Connecting và bắt đầu kết nối TCP
-            listener.onStateUpdate(PhoneClone.State.Connecting("Connecting to server..."))
-            Log.d(TAG, "Got peer IP: $peerIp.")
+            _events.emit(TransferEvent.OnConnecting("Connecting to server..."))
+
+
         }
     }
 
@@ -197,13 +204,18 @@ class ConnectionManager(
         if (deviceInfo != null) {
             Log.d(TAG, "Smart Switch: Received device info: deviceName=${deviceInfo.deviceName}, ipAddress=${deviceInfo.ipAddress}")
 
+            val isSender = TransferSession.isSender()
             if (isSender) {
                 Log.d(TAG, "Smart Switch: Receiver received device info but hasn't sent yet, sending now")
-                listener.onStateUpdate(PhoneClone.State.Connected(deviceInfo))
+                scope.launch {
+                    _events.emit(TransferEvent.OnConnected(deviceInfo))
+                }
             } else {
                 Log.d(TAG, "handleDeviceInfo: send back my device info")
+                scope.launch {
+                    _events.emit(TransferEvent.onSearchContent(deviceInfo))
+                }
                 sendDeviceInfo()
-                listener.onStateUpdate(PhoneClone.State.SearchingContent(deviceInfo))
             }
         }
     }

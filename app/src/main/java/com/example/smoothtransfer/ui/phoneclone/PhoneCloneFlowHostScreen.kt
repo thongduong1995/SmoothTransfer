@@ -155,6 +155,8 @@ fun PhoneCloneFlowHostScreen(
                     }
                 )
             }
+
+            is PhoneClone.State.Error -> TODO()
         }
     }
 }

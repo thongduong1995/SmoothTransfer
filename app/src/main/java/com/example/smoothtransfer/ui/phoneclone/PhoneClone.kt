@@ -27,6 +27,7 @@ object PhoneClone {
         data class Transferring(val progress: Float, val statusText: String) : State()
         object Restoring : State()
         object Completed : State()
+        data class Error(val reason: String) : State()
     }
 
     /**
