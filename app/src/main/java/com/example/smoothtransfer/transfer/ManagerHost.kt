@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import com.example.smoothtransfer.network.ConnectionManager
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
+import com.example.smoothtransfer.ui.phoneclone.PhoneClone.State.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,14 +53,16 @@ class ManagerHost(private val application: Application) {
             .onEach { event ->
                 Log.d(TAG, "listenToAllTransferEvents event: ${event::class.simpleName}")
                 val newState = when (event) {
-                    is TransferEvent.OnConnecting -> PhoneClone.State.Connecting(event.message)
+                    is TransferEvent.OnConnecting -> Connecting(event.message)
                     is TransferEvent.OnConnected -> {
                         // Khi kết nối thành công, có thể ra lệnh cho MediaManager quét file
                         // mediaManager.scanImages()
-                        PhoneClone.State.Connected(event.deviceInfo)
+                        Connected(event.deviceInfo)
                     }
-                    is TransferEvent.OnConnectionLost -> PhoneClone.State.Error(event.reason)
-                    is TransferEvent.onSearchContent -> PhoneClone.State.SearchingContent(event.deviceInfo)
+                    is TransferEvent.OnConnectionLost -> Error(event.reason)
+                    is TransferEvent.onSearchContent -> SearchingContent(event.deviceInfo)
+                    is TransferEvent.OnError -> Error("Error")
+                    is TransferEvent.OnQrCodeReady -> DisplayQrCode(event.qrData)
                 }
                 _uiState.value = newState
             }
@@ -74,6 +77,10 @@ class ManagerHost(private val application: Application) {
     fun startConnect() {
         Log.d(TAG, "startConnect")
         connectionManager.startConnect()
+    }
+
+    fun prepareQrCodeForReceiver() {
+        connectionManager.prepareQrCodeData()
     }
 
 

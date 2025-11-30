@@ -89,13 +89,19 @@ class PhoneCloneConnectionViewModel(
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     private fun handleSelectMethodEvents(event: PhoneClone.Event.MethodSelected) {
         TransferSession.setServiceType(event.serviceType)
+        managerHost.startConnect()
         if (event.serviceType.isWifi()) {
             if (TransferSession.isSender()) {
                 updateUiState(PhoneClone.State.ShowCameraToScanQr)
             } else {
-                updateUiState(PhoneClone.State.DisplayQrCode(TransferSession.isSender()))
+                //updateUiState(PhoneClone.State.DisplayQrCode(TransferSession.isSender()))
+                // Sau khi đã `startConnect`, bây giờ chúng ta có thể yêu cầu tạo QR code.
+                // ManagerHost sẽ nhận lệnh này, ủy thác xuống ConnectionManager,
+                // ConnectionManager sẽ yêu cầu `WifiAwareService` (đã được khởi tạo) tạo dữ liệu.
+                // Cuối cùng, ManagerHost sẽ phát ra State.DisplayQrCode.
+                managerHost.prepareQrCodeForReceiver()
             }
-            managerHost.startConnect()
+
         } else { // Cable
         }
     }

@@ -165,6 +165,10 @@ class WifiAwareService(
         nettyTransport.connectToServer(peerIp, TCP_PORT)
     }
 
+    override fun getQrCodeData(): WifiQrData {
+        return WifiQrData("SmartSwitch", "11111", "")
+    }
+
     fun setRole(role: Role) {
         this.currentRole = role
     }

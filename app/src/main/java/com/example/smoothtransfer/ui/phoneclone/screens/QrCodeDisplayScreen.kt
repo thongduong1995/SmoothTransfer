@@ -31,7 +31,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import android.widget.ImageView
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsets
-import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.network.wifi.WifiQrData
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.utils.QrCodeHelper
 
@@ -39,7 +39,7 @@ import com.example.smoothtransfer.utils.QrCodeHelper
 @Composable
 fun QrCodeDisplayScreen(
     action: PhoneClone.PhoneCloneActions,
-    qrData: WifiAwareQrData?,
+    qrData: WifiQrData?,
     onBackClicked: () -> Unit
 ) {
 

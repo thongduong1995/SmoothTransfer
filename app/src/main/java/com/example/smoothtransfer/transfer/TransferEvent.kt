@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.transfer
 
 import com.example.smoothtransfer.network.protocol.DeviceInfo
+import com.example.smoothtransfer.network.wifi.WifiQrData
 
 /**
  * Một interface chung cho tất cả các sự kiện có thể xảy ra trong quá trình truyền dữ liệu.
@@ -12,6 +13,9 @@ sealed interface TransferEvent {
     data class onSearchContent(val deviceInfo: DeviceInfo) : TransferEvent
     data class OnConnectionLost(val reason: String = "Connection Lost") : TransferEvent
     data class OnConnecting(val message: String) : TransferEvent
+    data class OnQrCodeReady(val qrData: WifiQrData) : TransferEvent
+
+    data class OnError(val message: String) : TransferEvent
 
     // Các sự kiện từ MediaManager (ví dụ trong tương lai)
     // data class OnMediaScanComplete(val images: List<Uri>) : TransferEvent

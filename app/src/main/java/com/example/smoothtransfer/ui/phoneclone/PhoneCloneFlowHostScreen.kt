@@ -13,7 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.network.wifi.WifiQrData
 import com.example.smoothtransfer.ui.phoneclone.screens.ConnectedScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.ConnectingScreen
 import com.example.smoothtransfer.ui.phoneclone.screens.PermissionRequestScreen
@@ -160,12 +160,12 @@ fun PhoneCloneFlowHostScreen(
 
             // --- Các màn hình khác của luồng Receiver sẽ được thêm vào đây ---
             is PhoneClone.State.DisplayQrCode -> {
-                val qrData = WifiAwareQrData(
+              /*  val qrData = WifiQrData(
                     serviceName = "SmartSwitch",
                     peerId = UUID.randomUUID().toString(),
                     connectionMetadata = ""
-                )
-                QrCodeDisplayScreen(viewModel, qrData, onBackClicked = {
+                )*/
+                QrCodeDisplayScreen(viewModel, targetState.qrData, onBackClicked = {
                     viewModel.onEvent(PhoneClone.Event.BackPressed)
                 })
             }

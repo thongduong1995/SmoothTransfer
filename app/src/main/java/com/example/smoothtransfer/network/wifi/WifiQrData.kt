@@ -3,15 +3,12 @@ package com.example.smoothtransfer.network.wifi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.JsonBuilder
 
 /**
  * Data class representing the information encoded in QR code for Wi-Fi Aware connection
  */
 @Serializable
-data class WifiAwareQrData(
+data class WifiQrData(
     val serviceName: String,
     val peerId: String,
     val connectionMetadata: String = ""
@@ -29,9 +26,9 @@ data class WifiAwareQrData(
         /**
          * Parse JSON string from scanned QR code
          */
-        fun fromJson(jsonString: String): WifiAwareQrData? {
+        fun fromJson(jsonString: String): WifiQrData? {
             return try {
-                json.decodeFromString<WifiAwareQrData>(jsonString)
+                json.decodeFromString<WifiQrData>(jsonString)
             } catch (e: Exception) {
                 null
             }

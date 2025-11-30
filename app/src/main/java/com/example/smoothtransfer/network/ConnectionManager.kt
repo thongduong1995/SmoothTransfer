@@ -278,4 +278,18 @@ class ConnectionManager(
         heartbeatJob = null
         Log.d(TAG, "Heartbeat job stopped.")
     }
+
+    fun prepareQrCodeData() {
+        scope.launch {
+            val qrData = transferService?.getQrCodeData()
+            if (qrData != null) {
+                _events.emit(TransferEvent.OnQrCodeReady(qrData))
+            } else {
+                Log.e(TAG, "prepareQrCodeData: currentMethod is null or does not support QR code.")
+                _events.emit(TransferEvent.OnError("This connection method does"))
+            }
+        }
+    }
+
+
 }

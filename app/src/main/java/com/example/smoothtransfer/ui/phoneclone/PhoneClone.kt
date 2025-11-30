@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.ui.phoneclone
 
 import com.example.smoothtransfer.network.protocol.DeviceInfo
+import com.example.smoothtransfer.network.wifi.WifiQrData
 import com.example.smoothtransfer.transfer.ServiceType
 
 // Dùng "Contract" để nhóm State, Event, và có thể cả Effect
@@ -26,7 +27,7 @@ object PhoneClone {
 
         data class SelectTransferMethod(val isSender: Boolean) : State()
         object ShowCameraToScanQr : State() // Sender thấy camera để quét
-        data class DisplayQrCode(val isSender: Boolean) : State()     // Receiver hiển thị QR code
+        data class DisplayQrCode(val qrData: WifiQrData) : State()     // Receiver hiển thị QR code
         data class Connecting(val message: String = "Connecting...") : State()
         data class Connected(val deviceInfo: DeviceInfo) : State()
 

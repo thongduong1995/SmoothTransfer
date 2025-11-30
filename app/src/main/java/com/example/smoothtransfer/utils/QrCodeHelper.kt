@@ -10,7 +10,7 @@ import kotlin.apply
 import kotlin.ranges.until
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
-import com.example.smoothtransfer.network.wifi.WifiAwareQrData
+import com.example.smoothtransfer.network.wifi.WifiQrData
 
 object QrCodeHelper {
     /**
@@ -42,15 +42,15 @@ object QrCodeHelper {
     /**
      * Generate QR code bitmap from WifiAwareQrData
      */
-    fun generateQrCodeBitmap(qrData: WifiAwareQrData, size: Int = 512): Bitmap {
+    fun generateQrCodeBitmap(qrData: WifiQrData, size: Int = 512): Bitmap {
         return generateQrCodeBitmap(qrData.toJson(), size)
     }
 
     /**
      * Parse QR code data string to WifiAwareQrData
      */
-    fun parseQrCodeData(qrData: String): WifiAwareQrData? {
-        return WifiAwareQrData.fromJson(qrData)
+    fun parseQrCodeData(qrData: String): WifiQrData? {
+        return WifiQrData.fromJson(qrData)
     }
 }
 

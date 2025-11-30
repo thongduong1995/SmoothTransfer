@@ -136,11 +136,11 @@ fun SelectTransferMethodScreen(
 
                 MethodSelectButton(
                     modifier = Modifier.weight(1f),
-                    title = "Wifi",
+                    title = "WiFi Direct",
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
                     icon = { Icons.Default.PhoneAndroid }, // Icon nhận
                     backgroundColor = Color(0xFF2962FF), // Màu xanh dương
-                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(ServiceType.WIFI_AWARE)) }
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(ServiceType.WIFI_DIRECT)) }
                 )
                 Spacer(modifier = Modifier.height(64.dp))
             }

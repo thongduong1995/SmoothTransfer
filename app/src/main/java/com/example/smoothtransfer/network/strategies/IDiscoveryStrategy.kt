@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.network.strategies
 
 import com.example.smoothtransfer.network.protocol.Packet
+import com.example.smoothtransfer.network.wifi.WifiQrData
 import kotlinx.coroutines.flow.SharedFlow
 
 /** * Các sự kiện mà một chiến lược có thể phát ra để báo cáo cho ConnectionManager.
@@ -42,4 +43,5 @@ interface IDiscoveryStrategy {
      */
     fun sendPacket(packet: Packet)
     fun startConnectAsSender(peerIp: String)
+    fun getQrCodeData(): WifiQrData
 }
