@@ -7,16 +7,15 @@ import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.example.smoothtransfer.data.local.MainDataModel
-import com.example.smoothtransfer.network.netty.NettyTcpClient
-import com.example.smoothtransfer.network.netty.NettyTcpServer
 import com.example.smoothtransfer.network.protocol.Commands
 import com.example.smoothtransfer.network.protocol.DeviceInfo
 import com.example.smoothtransfer.network.protocol.Packet
+import com.example.smoothtransfer.network.strategies.IDiscoveryStrategy
+import com.example.smoothtransfer.network.strategies.StrategyEvent
 import com.example.smoothtransfer.network.wifi.WifiAwareService
+import com.example.smoothtransfer.transfer.ServiceType
 import com.example.smoothtransfer.transfer.TransferEvent
 import com.example.smoothtransfer.transfer.TransferSession
-import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.utils.NetworkUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,8 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ConnectionManager(
@@ -34,51 +31,15 @@ class ConnectionManager(
 ) {
     companion object {
         private const val TAG = "SmartSwitch ConnectionManager"
-        private const val TCP_PORT = 8888
     }
 
-    // Thay vì ConnectionEvent, giờ chúng ta dùng TransferEvent
     private val _events = MutableSharedFlow<TransferEvent>()
     val events: SharedFlow<TransferEvent> = _events.asSharedFlow()
 
     private var wakeLock: PowerManager.WakeLock? = null
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val wifiAwareService: WifiAwareService = WifiAwareService(context)
 
-    private val nettyServer by lazy {
-        NettyTcpServer(
-            onConnectionStateChange = { isConnected ->
-                handleTcpConnectionResult(isConnected, isServer = true)
-            },
-            onPacketReceived = { packet ->
-                handleReceivedPacket(packet)
-            }
-        )
-    }
-
-    private val nettyClient by lazy {
-        NettyTcpClient (
-            onConnectionStateChange = { isConnected ->
-                handleTcpConnectionResult(isConnected, isServer = false)
-            },
-            onPacketReceived = { packet ->
-                handleReceivedPacket(packet)
-            }
-        )
-    }
-
-    private fun handleTcpConnectionResult(connected: Boolean, isServer: Boolean) {
-        val isSender = TransferSession.isSender()
-        Log.d(TAG, "handleTcpConnectionResult. isSender: $isSender, connected: $connected, isServer: $isServer")
-        if (connected) {
-            acquireWakeLock()
-            if (TransferSession.isSender()) {
-                sendDeviceInfo()
-            }
-        } else {
-
-        }
-    }
+    private var transferService: IDiscoveryStrategy? = null
 
     private fun sendDeviceInfo() {
         try {
@@ -113,56 +74,69 @@ class ConnectionManager(
     }
 
     private fun sendPacket(packet: Packet) {
-        val isSender = TransferSession.isSender()
-        if (isSender) {
-            nettyClient.sendPacket(packet)
-        } else {
-            nettyServer.sendPacket(packet)
-        }
+        transferService?.sendPacket(packet)
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
-    fun startConnect(isWifi: Boolean, isSender: Boolean) {
-        Log.d(TAG,"startConnect:  isWifi: $isWifi, isSender: $isSender")
-        if (isWifi) {
-            if (isSender) {
-                listenForPeerIpAndConnect()
-            } else {
-                wifiAwareService.setRole(WifiAwareService.Role.RECEIVER)
-                wifiAwareService.enable()
-                listenForPeerIpAndConnect()
-            }
-        }
+    fun startConnect() {
+        initConnectionService()
+        transferService?.startConnect()
     }
 
-    private fun listenForPeerIpAndConnect() {
+    private fun initConnectionService() {
+        Log.d(TAG, "initConnectionService")
+
+        val role = TransferSession.getRole()
+        val serviceType = TransferSession.getServiceType()
+        Log.d(TAG, "Starting with role: $role, serviceType: $serviceType")
+
+        transferService?.stop()
+        transferService = when (serviceType) {
+            ServiceType.WIFI_AWARE -> WifiAwareService(context)
+            ServiceType.WIFI_DIRECT -> null
+            ServiceType.OTG -> null
+            ServiceType.NONE -> null
+        }
+
+        // 2. Lắng nghe "kênh phát sóng" của phương thức đó
+        listenToMethodEvents()
+    }
+
+    private fun listenToMethodEvents() {
         scope.launch {
-            // Lấy địa chỉ IP đầu tiên không phải null từ MainDataModel
-            val peerIp = MainDataModel.peerIP.filterNotNull().first()
-            Log.d(TAG, "Got peer IP: $peerIp.")
-            val isSender = TransferSession.isSender()
-            if (isSender) {
-                connectToServer(peerIp)
-            } else {
-                nettyServer.start ()
+            transferService?.events?.collect { event ->
+                // Khi nhận được "tin tức" từ WifiAwareService...
+                Log.d(TAG, "Received MethodEvent: ${event::class.simpleName}")
+
+                // ...ConnectionManager sẽ xử lý và "dịch" nó thành TransferEvent
+                // để báo cáo lên cấp cao hơn (ManagerHost).
+                when (event) {
+                    is StrategyEvent.IpAddressAvailable -> {
+                        // Đây chính là nơi bạn muốn emit OnConnecting
+                        _events.emit(TransferEvent.OnConnecting("Peer found. Establishing TCP..."))
+                    }
+                    is StrategyEvent.TransportConnectionChanged -> {
+                        if (event.isConnected) {
+                            acquireWakeLock()
+                            startHeartbeat()
+                            if (TransferSession.isSender()) sendDeviceInfo()
+                        } else {
+                            releaseWakeLock()
+                            stopHeartbeat()
+                            _events.emit(TransferEvent.OnConnectionLost("Transport disconnected"))
+                        }
+                    }
+                    is StrategyEvent.PacketReceived -> handleReceivedPacket(event.packet)
+                    is StrategyEvent.Error -> _events.emit(TransferEvent.OnConnectionLost(event.message))
+                }
             }
-            // Khi có IP, chuyển sang màn hình Connecting và bắt đầu kết nối TCP
-            _events.emit(TransferEvent.OnConnecting("Connecting to server..."))
-
-
         }
     }
 
-    private fun connectToServer(peerIp: String) {
-        Log.d(TAG, "connectToServer Got peer IP: $peerIp. Starting Netty client...")
-        nettyClient.disconnect()
-        nettyClient.connect(peerIp, TCP_PORT)
-    }
 
     fun stop() {
         Log.d(TAG, "Stopping ConnectionManager.")
-        nettyClient.disconnect()
-        nettyServer.stop()
+        transferService?.stop()
     }
 
     private fun getDeviceName(): String {
@@ -222,8 +196,7 @@ class ConnectionManager(
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     fun startPreSenderConnect() {
-        wifiAwareService.setRole(WifiAwareService.Role.SENDER)
-        wifiAwareService.enable()
+       transferService?.startPreSender()
     }
 
     private fun acquireWakeLock() {

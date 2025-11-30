@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.ui.phoneclone
 
 import com.example.smoothtransfer.network.protocol.DeviceInfo
+import com.example.smoothtransfer.transfer.ServiceType
 
 // Dùng "Contract" để nhóm State, Event, và có thể cả Effect
 object PhoneClone {
@@ -47,7 +48,7 @@ object PhoneClone {
         data class UsbAttached(val isSender: Boolean) : Event()
         data class RoleSelected(val isSender: Boolean) : Event()
 
-        data class MethodSelected(val isWifi: Boolean) : Event()
+        data class MethodSelected(val serviceType: ServiceType) : Event()
 
         // Sự kiện kết nối
         data class QrCodeScanned(val qrData: String) : Event()

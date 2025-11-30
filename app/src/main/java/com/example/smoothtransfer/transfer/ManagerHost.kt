@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.onEach
 @OptIn(ExperimentalCoroutinesApi::class)
 class ManagerHost(private val application: Application) {
     companion object {
-        private const val TAG = " SmartSwitch TransferCoordinator"
+        private const val TAG = " SmartSwitch ManagerHost"
     }
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -32,7 +32,7 @@ class ManagerHost(private val application: Application) {
 
     // --- 2. Khai báo các Manager "vai trò" ---
     // ManagerHost giờ chỉ biết đến các manager cấp cao.
-    private val connectionManager = ConnectionManager(application)
+    private val connectionManager by lazy { ConnectionManager(application) }
     // private val mediaManager = MediaManager(application) // Sẽ thêm sau
     // private val apkManager = ApkManager(application)   // Sẽ thêm sau
 
@@ -50,10 +50,7 @@ class ManagerHost(private val application: Application) {
     private fun listenToAllTransferEvents(eventsFlow: Flow<TransferEvent>) {
         eventsFlow
             .onEach { event ->
-                Log.d(TAG, "Processing event: ${event::class.simpleName}")
-
-                // Dùng `when` để xử lý tất cả các loại sự kiện
-                // và cập nhật _uiState tương ứng.
+                Log.d(TAG, "listenToAllTransferEvents event: ${event::class.simpleName}")
                 val newState = when (event) {
                     is TransferEvent.OnConnecting -> PhoneClone.State.Connecting(event.message)
                     is TransferEvent.OnConnected -> {
@@ -70,12 +67,13 @@ class ManagerHost(private val application: Application) {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
-    fun startConnectionProcess(isWifi: Boolean, isSender: Boolean) {
+    fun startConnectionProcess(serviceType: ServiceType) {
         connectionManager.startPreSenderConnect()
     }
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
-    fun startConnect(isWifi: Boolean, sender: Boolean) {
-        connectionManager.startConnect(isWifi, sender)
+    fun startConnect() {
+        Log.d(TAG, "startConnect")
+        connectionManager.startConnect()
     }
 
 

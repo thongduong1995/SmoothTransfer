@@ -57,7 +57,7 @@ class PhoneCloneConnectionViewModel(
 
             is PhoneClone.Event.QrCodeScanned -> {
                 updateUiState(PhoneClone.State.Connecting())
-                managerHost.startConnectionProcess(isWifi = true, isSender = TransferSession.isSender())
+                managerHost.startConnectionProcess(TransferSession.getServiceType())
             }
 
             is PhoneClone.Event.BackPressed -> navigateBack()
@@ -88,13 +88,14 @@ class PhoneCloneConnectionViewModel(
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
     private fun handleSelectMethodEvents(event: PhoneClone.Event.MethodSelected) {
-        if (event.isWifi) {
+        TransferSession.setServiceType(event.serviceType)
+        if (event.serviceType.isWifi()) {
             if (TransferSession.isSender()) {
                 updateUiState(PhoneClone.State.ShowCameraToScanQr)
             } else {
                 updateUiState(PhoneClone.State.DisplayQrCode(TransferSession.isSender()))
             }
-            managerHost.startConnect(isWifi = true, TransferSession.isSender())
+            managerHost.startConnect()
         } else { // Cable
         }
     }

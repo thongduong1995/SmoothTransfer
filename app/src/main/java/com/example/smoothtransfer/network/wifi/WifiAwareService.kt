@@ -28,22 +28,43 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.example.smoothtransfer.data.local.MainDataModel
+import com.example.smoothtransfer.network.netty.NettyTransport
+import com.example.smoothtransfer.network.protocol.Packet
+import com.example.smoothtransfer.network.strategies.IDiscoveryStrategy
+import com.example.smoothtransfer.network.strategies.StrategyEvent
+import com.example.smoothtransfer.transfer.TransferSession
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.net.Inet6Address
 import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
 
-class WifiAwareService(private val context: Context) {
+class WifiAwareService(
+    private val context: Context
+): IDiscoveryStrategy {
     companion object {
         private const val TAG = "SmartSwitch WifiAwareService"
         private const val SERVICE_NAME = "SmoothTransfer_Service"
         private const val PSK_PASSPHRASE = "SmoothTransfer2024"
+        private const val TCP_PORT = 8888
     }
 
     enum class Role {
         SENDER,
         RECEIVER
     }
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val _events = MutableSharedFlow<StrategyEvent>()
+    override val events: SharedFlow<StrategyEvent> = _events.asSharedFlow()
+
 
     var currentRole: Role = Role.SENDER
 
@@ -53,6 +74,11 @@ class WifiAwareService(private val context: Context) {
     private val connectivityManager: ConnectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+    private val nettyTransport = NettyTransport(
+        onConnectionStateChange = { isConnected -> scope.launch { _events.emit(StrategyEvent.TransportConnectionChanged(isConnected)) } },
+        onPacketReceived = { packet -> scope.launch { _events.emit(StrategyEvent.PacketReceived(packet)) } }
+    )
+
     private var awareSession: WifiAwareSession? = null
     private var publishSession: PublishDiscoverySession? = null
     private var subscribeSession: SubscribeDiscoverySession? = null
@@ -61,14 +87,7 @@ class WifiAwareService(private val context: Context) {
 
     private var peerHandle: PeerHandle? = null
 
-    private var serverSocket: ServerSocket? = null
-    private var currentNetwork: Network? = null
-    private var networkCallback: NetworkCallback? = null
-
     private var myMacAddress = ""
-
-    private var discoveredPeerHandle: PeerHandle? = null
-    private var publisherPeerHandle: PeerHandle? = null
 
     private var myIP: String? = null
     private var peerIP: String? = null
@@ -83,11 +102,67 @@ class WifiAwareService(private val context: Context) {
         data class Error(val message: String) : ConnectionState()
     }
 
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
+    override fun startConnect() {
+        val isWifi = TransferSession.getServiceType().isWifi()
+        val isSender = TransferSession.isSender()
+        Log.d(TAG,"startConnect:  serviceType: ${TransferSession.getServiceType()}, isSender: $isSender")
+        if (isWifi) {
+            if (isSender) {
+                listenForPeerIpAndConnect()
+            } else {
+                setRole(Role.RECEIVER)
+                enable()
+                listenForPeerIpAndConnect()
+            }
+        }
+    }
+
+    private fun listenForPeerIpAndConnect() {
+        scope.launch {
+            // Lấy địa chỉ IP đầu tiên không phải null từ MainDataModel
+            val peerIp = MainDataModel.peerIP.filterNotNull().first()
+            Log.d(TAG, "Got peer IP: $peerIp.")
+            val isSender = TransferSession.isSender()
+            if (isSender) {
+                Log.d(TAG, "connectToServer Got peer IP: $peerIp. Starting Netty client...")
+                startConnectAsSender(peerIp)
+            } else {
+                nettyTransport.startServer()
+            }
+            // Khi có IP, chuyển sang màn hình Connecting và bắt đầu kết nối TCP
+            //_events.emit(TransferEvent.OnConnecting("Connecting to server..."))
+            _events.emit(StrategyEvent.IpAddressAvailable(peerIp))
+
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES])
+    override fun startPreSender() {
+        setRole(Role.SENDER)
+        enable()
+    }
+
+    override fun stop() {
+        nettyTransport.stopServer()
+        nettyTransport.disconnectClient()
+    }
+
+    override fun sendPacket(packet: Packet) {
+        nettyTransport.sendPacket(packet)
+    }
+
     /**
      * Check if Wi-Fi Aware is available
      */
     fun isAvailable(): Boolean {
         return wifiAwareManager?.isAvailable == true
+    }
+
+    override fun startConnectAsSender(peerIp: String) {
+        nettyTransport.disconnectClient()
+        nettyTransport.connectToServer(peerIp, TCP_PORT)
     }
 
     fun setRole(role: Role) {
@@ -425,5 +500,9 @@ class WifiAwareService(private val context: Context) {
             subscribeSession?.sendMessage(peerHandle!!, CMD_AWARE_CONNECTION_INFO, data)
         }
 
+    }
+
+    fun serverStart() {
+        nettyTransport.startServer()
     }
 }

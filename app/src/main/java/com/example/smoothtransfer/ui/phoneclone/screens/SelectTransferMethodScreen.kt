@@ -41,6 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smoothtransfer.transfer.ServiceType
+import com.example.smoothtransfer.transfer.TransferSession
 import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import com.example.smoothtransfer.ui.theme.SmoothTransferTheme
 
@@ -128,7 +130,7 @@ fun SelectTransferMethodScreen(
                     subtitle = if (isSender) "Send from this phone without internet" else "Receive from this phone without internet",
                     icon = { Icons.Default.PhoneAndroid },
                     backgroundColor = Color(0xFF00C853), // Màu xanh lá cây
-                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(true)) }
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(ServiceType.WIFI_AWARE)) }
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -138,7 +140,7 @@ fun SelectTransferMethodScreen(
                     subtitle = if (isSender) "Send from this phone" else "Receive from this phone",
                     icon = { Icons.Default.PhoneAndroid }, // Icon nhận
                     backgroundColor = Color(0xFF2962FF), // Màu xanh dương
-                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(true)) }
+                    onClick = { action.onEvent(PhoneClone.Event.MethodSelected(ServiceType.WIFI_AWARE)) }
                 )
                 Spacer(modifier = Modifier.height(64.dp))
             }
