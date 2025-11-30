@@ -1,6 +1,7 @@
 package com.example.smoothtransfer.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -63,7 +64,9 @@ fun BottomNavigationBar(navController: NavController) {
 
         // Sử dụng màu nền của theme và thêm một chút "độ cao" (elevation)
         // 3.dp là một giá trị phổ biến cho BottomNavBar
-        modifier = Modifier.padding(top = 8.dp),
+        modifier = Modifier
+            // Đặt một chiều cao mới, nhỏ hơn 80.dp. Ví dụ: 64.dp
+            .height(84.dp),
         //windowInsets = WindowInsets.navigationBars,
         containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
     ) {

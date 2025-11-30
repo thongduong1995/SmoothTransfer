@@ -1,16 +1,21 @@
 package com.example.smoothtransfer.ui.phoneclone.screens
 
 // Thêm import cho icon Android
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -143,57 +149,68 @@ fun RoleButton(
     onClick: () -> Unit,
     isSender: Boolean = true
 ) {
-    // --- 1. Tạo State và Animation ---
-    // State để theo dõi trạng thái nhấn (pressed)
-    var isPressed by remember { mutableStateOf(false) }
-    // Tạo animation cho giá trị scale.
-    // Nó sẽ tự động thay đổi mượt mà khi `isPressed` thay đổi.
+    // --- 1. Tạo InteractionSource để lắng nghe sự kiện nhấn/nhả ---
+    val interactionSource = remember { MutableInteractionSource() }
+    // `isPressed` bây giờ sẽ tự động cập nhật khi có tương tác nhấn/nhả
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // --- 2. Animation thu nhỏ vẫn giữ nguyên, nhưng giờ sẽ dựa vào isPressed mới ---
     val scale by animateFloatAsState(
-        // Nếu đang nhấn, thu nhỏ lại còn 95% (0.95f).
-        // Nếu không nhấn, trở về kích thước gốc (1f).
-        targetValue = if (isPressed) 0.85f else 1f,
-        animationSpec = tween(durationMillis = 300), // Animation diễn ra nhanh
+        targetValue = if (isPressed) 0.9f else 1f, // Thu nhỏ mạnh hơn một chút
+        animationSpec = tween(durationMillis = 200),
         label = "button_press_scale"
     )
 
     Box(
         modifier = modifier
+            // --- 3. Áp dụng animation scale bằng graphicsLayer ---
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        // KHI BẮT ĐẦU NHẤN XUỐNG
-                        isPressed = true // Kích hoạt animation thu nhỏ
-                        try {
-                            // Chờ cho đến khi người dùng nhả tay ra
-                            awaitRelease()
-                        } finally {
-                            // KHI NHẢ TAY RA (hoặc cử chỉ bị hủy)
-                            isPressed = false // Kích hoạt animation phóng to trở lại
-                        }
-                    },
-                    onTap = {
-                        // KHI MỘT CỬ CHỈ "TAP" HOÀN CHỈNH (NHẤN XUỐNG VÀ NHẢ RA)
-                        // ĐƯỢC GHI NHẬN, HÀNH ĐỘNG onClick SẼ ĐƯỢC GỌI NGAY LẬP TỨC.
-                        onClick()
-                    }
-                )
-            }
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.8f),// Màu của bóng môi trường (thường là đen)
-                spotColor = Color.Black.copy(alpha = 0.8f) // àu của bóng từ nguồn sáng (thường là đen)
+                ambientColor = Color.Black.copy(alpha = 0.5f),
+                spotColor = Color.Black.copy(alpha = 0.5f)
             )
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(24.dp)) // Bo tròn lớn hơn cho đẹp
             .background(backgroundColor)
-            //.clickable(onClick = onClick)
-            .padding(4.dp),
-            contentAlignment = Alignment.Center
+            // --- 4. Sử dụng Modifier.clickable với InteractionSource ---
+            // Thao tác này sẽ tự động cung cấp hiệu ứng gợn sóng (ripple)
+            // và cập nhật `isPressed` cho chúng ta.
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null, // Tắt hiệu ứng gợn sóng mặc định để tùy chỉnh
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
     ) {
+        // Lớp phủ tối màu khi nhấn
+        AnimatedVisibility(
+            visible = isPressed,
+            enter = fadeIn(animationSpec = tween(100)),
+            exit = fadeOut(animationSpec = tween(200))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.2f))
+            )
+        }
+
+ /*       // Hiệu ứng gợn sóng tùy chỉnh bên trên lớp phủ
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = interactionSource,
+                   // indication = rememberRipple(color = Color.White), // Hiệu ứng gợn sóng màu trắng
+                    onClick = { *//* để trống vì đã xử lý ở ngoài *//* }
+                )
+        )*/
+
+        // --- 5. Nội dung của nút không thay đổi ---
         PhoneCloneBackgroundEffect(isSender)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -216,16 +233,6 @@ fun RoleButton(
             )
         }
     }
-}
-
-@Composable
-fun ReceiveIcon() {
-    Icon(
-        Icons.Default.PhoneAndroid,
-        contentDescription = stringResource(R.string.receive),
-        tint = Color.White,
-        modifier = Modifier.size(28.dp)
-    )
 }
 
 
@@ -337,54 +344,6 @@ fun PhoneTransferAnimation() {
                     scaleX = rightPhoneScale
                     scaleY = rightPhoneScale
                 }
-        )
-    }
-}
-
-@Composable
-fun ModernPhoneCanvas(
-    modifier: Modifier = Modifier,
-    color: Color
-) {
-    Canvas(modifier = modifier) {
-        val bodyCornerRadius = 24f
-        val screenPadding = 12f
-        val screenCornerRadius = 16f
-        val punchHoleRadius = 8f
-        val speakerHeight = 8f
-        val speakerWidth = size.width * 0.3f
-
-        // 1. Vẽ thân máy (vỏ ngoài) với màu được truyền vào
-        drawRoundRect(
-            color = color,
-            size = size,
-            cornerRadius = CornerRadius(bodyCornerRadius)
-        )
-
-        // 2. Vẽ màn hình bên trong (màu tối hơn một chút)
-        drawRoundRect(
-            color = color.copy(alpha = 0.5f),
-            topLeft = Offset(screenPadding, screenPadding),
-            size = Size(
-                width = size.width - (screenPadding * 2),
-                height = size.height - (screenPadding * 2)
-            ),
-            cornerRadius = CornerRadius(screenCornerRadius)
-        )
-
-        // 3. Vẽ "nốt ruồi" (punch-hole camera)
-        drawCircle(
-            color = color,
-            radius = punchHoleRadius,
-            center = Offset(x = size.width / 2, y = screenPadding + punchHoleRadius + 12f)
-        )
-
-        // 4. Vẽ loa thoại
-        drawRoundRect(
-            color = color,
-            topLeft = Offset(x = (size.width - speakerWidth) / 2, y = screenPadding / 3),
-            size = Size(speakerWidth, speakerHeight),
-            cornerRadius = CornerRadius(speakerHeight / 2)
         )
     }
 }

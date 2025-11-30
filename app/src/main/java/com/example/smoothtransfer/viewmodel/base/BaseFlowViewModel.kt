@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.smoothtransfer.ui.phoneclone.PhoneClone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
  * @param S Kiểu dữ liệu cho State (ví dụ: PhoneClone.State)
  * @param E Kiểu dữ liệu cho Event (ví dụ: PhoneClone.Event)
  */
-abstract class BaseFlowViewModel<S : Any, E : Any>(
+abstract class BaseFlowViewModel<S : PhoneClone.State, E : Any>(
     application: Application,
     initialState: S
 ) : AndroidViewModel(application) {
@@ -62,7 +63,9 @@ abstract class BaseFlowViewModel<S : Any, E : Any>(
      */
     protected fun navigateBack() {
         if (stateHistory.isNotEmpty()) {
-            _state.value = stateHistory.removeLast()
+            val previousUiState = stateHistory.removeLast()
+            previousUiState.direction = PhoneClone.NavDirection.BACKWARD
+            _state.value = previousUiState
         }
     }
 }

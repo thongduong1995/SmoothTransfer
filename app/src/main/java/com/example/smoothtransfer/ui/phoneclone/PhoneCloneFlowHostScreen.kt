@@ -51,22 +51,50 @@ fun PhoneCloneFlowHostScreen(
         label = "screen_transition",
         // `transitionSpec` định nghĩa hiệu ứng chuyển cảnh.
         transitionSpec = {
-            // Hiệu ứng cho nội dung MỚI đi vào
-            // slideInHorizontally: Trượt vào từ bên phải màn hình
-            val enterTransition = slideInHorizontally(
-                animationSpec = tween(600),
-                initialOffsetX = { fullWidth -> fullWidth } // Bắt đầu từ ngoài cùng bên phải
-            ) + fadeIn(animationSpec = tween(600))
+            // Lấy hướng di chuyển từ trạng thái đích.
+            val direction = targetState.direction
+            // Thời gian animation, có thể điều chỉnh để nhanh hơn hoặc chậm hơn.
+            val duration = 400
 
-            // Hiệu ứng cho nội dung CŨ đi ra
-            // slideOutHorizontally: Trượt ra về phía bên trái màn hình
-            val exitTransition = slideOutHorizontally(
-                animationSpec = tween(600),
-                targetOffsetX = { fullWidth -> -fullWidth } // Điểm đến là ngoài cùng bên trái
-            ) + fadeOut(animationSpec = tween(600))
+            // Hiệu ứng "Shared Axis" kết hợp giữa slide một khoảng ngắn và fade.
+            // Điều này tạo cảm giác màn hình di chuyển trên trục Z.
+            when (direction) {
+                PhoneClone.NavDirection.FORWARD -> {
+                    // --- Hiệu ứng TIẾN TỚI (Phải -> Trái) ---
+                    (
+                            // Màn hình mới trượt vào từ phải, nhưng chỉ một khoảng ngắn.
+                            slideInHorizontally(animationSpec = tween(duration)) { fullWidth ->
+                                fullWidth / 4 // Trượt vào 1/5 chiều rộng
+                            } + fadeIn(animationSpec = tween(duration))
+                            ).togetherWith(
+                            // Màn hình cũ trượt ra về trái, cũng chỉ một khoảng ngắn.
+                            slideOutHorizontally(animationSpec = tween(duration)) { fullWidth ->
+                                -fullWidth / 4 // Trượt ra 1/5 chiều rộng
+                            } + fadeOut(animationSpec = tween(duration))
+                        )
+                }
 
-            // Kết hợp hai hiệu ứng lại
-            enterTransition togetherWith exitTransition
+                PhoneClone.NavDirection.BACKWARD -> {
+                    // --- Hiệu ứng LÙI LẠI (Trái -> Phải) ---
+                    (
+                            // Màn hình mới trượt vào từ trái.
+                            slideInHorizontally(animationSpec = tween(duration)) { fullWidth ->
+                                -fullWidth / 4
+                            } + fadeIn(animationSpec = tween(duration))
+                            ).togetherWith(
+                            // Màn hình cũ trượt ra về phải.
+                            slideOutHorizontally(animationSpec = tween(duration)) { fullWidth ->
+                                fullWidth / 4
+                            } + fadeOut(animationSpec = tween(duration))
+                        )
+                }
+
+                PhoneClone.NavDirection.NONE -> {
+                    // Lần đầu tải, chỉ cần fade in nhẹ nhàng, không trượt.
+                    fadeIn(animationSpec = tween(duration))
+                        .togetherWith(fadeOut(animationSpec = tween(duration)))
+                }
+            }
         }
     ) { targetState ->
 

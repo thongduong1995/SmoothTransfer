@@ -5,11 +5,19 @@ import com.example.smoothtransfer.network.protocol.DeviceInfo
 // Dùng "Contract" để nhóm State, Event, và có thể cả Effect
 object PhoneClone {
 
+    // 1. Enum để định nghĩa các hướng di chuyển
+    enum class NavDirection {
+        FORWARD, // Tiến tới
+        BACKWARD, // Lùi lại
+        NONE // Không có animation (cho lần tải đầu tiên)
+    }
+
     /**
      * Đại diện cho tất cả các màn hình/trạng thái trong luồng Phone Clone.
      * Mỗi object/class ở đây tương ứng với một màn hình UI.
      */
-    sealed class State {
+    sealed class State() {
+        var direction: NavDirection = NavDirection.FORWARD
         // Màn hình đầu tiên chọn Send/Receive (đã có ở PhoneCloneHomeScreen)
         // Đây là các màn hình BÊN TRONG luồng
         object SelectRole : State()
